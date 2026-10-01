@@ -1,0 +1,16 @@
+# Turkish ASR Core Dependencies
+torch>=2.0.0
+torchaudio>=2.0.0
+transformers>=4.38.0
+datasets[audio]>=2.18.0
+evaluate>=0.4.1
+jiwer>=3.0.3
+librosa>=0.10.1
+soundfile>=0.12.1
+accelerate>=0.27.0
+optimum>=1.17.0
+tqdm>=4.66.0
+pandas>=2.0.0
+morfessor>=2.0.6
+sentencepiece>=0.2.0
+numba

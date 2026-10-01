@@ -1,0 +1,13 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# HuggingFace & PyTorch Cache
+.cache/
+models/*.bin
+!models/turkish_morfessor_tokenizer/
