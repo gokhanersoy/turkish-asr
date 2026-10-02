@@ -1,0 +1,1 @@
+from .turkish_morpho_tokenizer import TurkishMorphoTokenizer

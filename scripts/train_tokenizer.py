@@ -5,14 +5,17 @@ Usage:
     python scripts/train_tokenizer.py --dataset fleurs --sample-count 500 --output-dir models/turkish_morpho_tokenizer
 """
 
-import sys
 import os
-import argparse
-import logging
+import sys
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Add project root to sys.path FIRST before importing src modules
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+import argparse
+import logging
 
 from src.datasets.loader import TurkishDatasetLoader
 from src.tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer

@@ -12,11 +12,11 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import datasets
 
+from torch.optim import AdamW
 from transformers import (
     AutoProcessor, 
     AutoModelForSpeechSeq2Seq, 
     AutoModelForCTC,
-    AdamW, 
     get_linear_schedule_with_warmup
 )
 from peft import LoraConfig, get_peft_model, TaskType
