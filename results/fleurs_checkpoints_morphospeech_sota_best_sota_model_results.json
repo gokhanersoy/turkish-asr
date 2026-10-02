@@ -1,29 +1,29 @@
 {
   "model_name": "checkpoints/morphospeech_sota/best_sota_model",
   "sample_count": 50,
-  "wer_percentage": 114.35,
-  "cer_percentage": 92.39,
-  "avg_latency_seconds": 1.16,
+  "wer_percentage": 27.66,
+  "cer_percentage": 7.2,
+  "avg_latency_seconds": 0.62,
   "predictions_sample": [
     {
       "ref": "aynı ay başka bir yolcu uçağı meşhed'deki bir pisti aşarak bir duvara çarptı ve on yedi kişinin ölümüne neden oldu",
-      "pred": ".omba bir yolcu uçağı mes etteki bir piste aşarak bir duvara çar ve 17 kişinin ölümüne neden oldu ?buğdukı'luu bu yolları yarakınca daha sonraki suikli bir pisti besmeş etteki bir pistü aşarakbir duvare çarptı ve on yedi kişinin ölümüne neden oldu?bu ününe neden oldu?..atıyor ki bu yılcı uçevı ve 17 kişi'nin ölümünü neden oldu muhtemelen oldu vaydağını aldı ve oluldo"
+      "pred": "aynı ay başka bir yolcu uçağı meşet'deki bir piste aşarak bir duvara çarptı ve 17 kişinin ölümüne neden oldu?"
     },
     {
       "ref": "romantizm goethe fichte ve schlegel gibi yazarlardan geçen geniş bir kültürel determinizm özelliği taşıyordu",
-      "pred": ".ombantizin politi besile gel gibi yazarlardan geçenurdu geniş bir kültüral determinmanızın özelliği taşıyordu romantizin göte pihte ve şle galgıbi yazarlardan geçen genişbir kültüral determinminizın özerliği taşıyorda oldu roman taziyordu tanıyordubu sürekeşten gelen geniş bi külterelde temel minuzun özelli taşıyardı"
+      "pred": "romantizin göte pihte ve şile gel gibi yazarlarından geçen geniş bir kültürel determininizin özelleyi taşıyordu."
     },
     {
       "ref": "japonya'nın nükleer ajansına göre tesiste radyoaktif sezyum ve iyodin tespit edildi",
-      "pred": ".omba göre tesiste radioaktif besrum ve i politim tespit edile ediyorliler"
+      "pred": "Japonya'nın nükleer ajansına göre tesiste radioaktif sezrum ve iodin tespit ediller."
     },
     {
       "ref": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebiyet veren şeylere ve çevrelerindeki şeylerin onlara belirli şeyleri yapıp yapmamasına sebep olan şeyler ile ilgilenir",
-      "pred": ".ombazi insanların yaptıkları şeyleri arzu etmelerine sebebi et veren politi beslen şeylere ve çevredirindeki şeylerin onlara belirlide şeyleriindeki şeyleri yapıp yakmamasına sebep olan şehiler ile ilgilenir"
+      "pred": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebi et veren şeylere ve çevredeğindeki şeylerin onlara belirli şeylerini yapıp yapmamasına sebep olan şehirler ile ilgilenir."
     },
     {
       "ref": "avrupa nispeten küçük ama birçok bağımsız ülkenin bulunduğu bir kıtadır normal şartlar altında birden fazla ülkeyi gezmek birçok vize uygulamalarından ve pasaport kontrollerinden geçmek anlamına gelmektedir",
-      "pred": ".omba bir çok bağımsız ülkenin besreden küçük ama birçok bağımızos ülkeinin bulunduğu bir kıtılır normal şatlar politiler altında birdan fazla ülkeyihı gezmek birçak bize uygul olanlarur ve passport kontrolülerinden geçmek anlamına gelmektedir"
+      "pred": "avrupa nispeden küçük ama bir çok bağımsız ülkenin bulunduğu bir kıtalılır normal şartlar altında birden fazla ülkeyi gezmek bir çok bize uygulonlarından ve pasaport kontrolüinden geçfek anlamına gelmektedir."
     }
   ]
 }
