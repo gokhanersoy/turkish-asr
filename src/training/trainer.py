@@ -64,7 +64,11 @@ class MorphoSpeechTrainer:
                 self.processor.tokenizer.language = "turkish"
                 self.processor.tokenizer.task = "transcribe"
             self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_name)
-            self.model.config.forced_decoder_ids = None
+            try:
+                forced_ids = self.processor.get_decoder_prompt_ids(language="turkish", task="transcribe")
+                self.model.config.forced_decoder_ids = forced_ids
+            except Exception:
+                self.model.config.forced_decoder_ids = None
             self.model.config.suppress_tokens = []
         else:
             self.is_encoder_decoder = False
@@ -139,6 +143,10 @@ class MorphoSpeechTrainer:
                 
                 if self.is_encoder_decoder:
                     labels = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
+                    # Slice off prompt prefix tokens if present to prevent double decoder_start_token_id alignment bug
+                    start_token_id = self.processor.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")
+                    if labels.shape[1] > 4 and labels[0, 0] == start_token_id:
+                        labels = labels[:, 4:]
                     # Replace pad token with -100 for loss computation
                     labels[labels == self.processor.tokenizer.pad_token_id] = -100
                     outputs = target_model(input_features=inputs.input_features, labels=labels)
