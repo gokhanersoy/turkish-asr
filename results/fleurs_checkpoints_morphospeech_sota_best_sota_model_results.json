@@ -1,29 +1,29 @@
 {
   "model_name": "checkpoints/morphospeech_sota/best_sota_model",
   "sample_count": 50,
-  "wer_percentage": 27.66,
-  "cer_percentage": 7.2,
-  "avg_latency_seconds": 0.62,
+  "wer_percentage": 235.76,
+  "cer_percentage": 221.3,
+  "avg_latency_seconds": 2.28,
   "predictions_sample": [
     {
       "ref": "aynı ay başka bir yolcu uçağı meşhed'deki bir pisti aşarak bir duvara çarptı ve on yedi kişinin ölümüne neden oldu",
-      "pred": "aynı ay başka bir yolcu uçağı meşet'deki bir piste aşarak bir duvara çarptı ve 17 kişinin ölümüne neden oldu?"
+      "pred": "aynı ay başka bir yolcu uçağı meş etteki 1 piste aşarak bir duvara çarptı ve 17 kişinin ölümüne neden oldu. ıcırlıdırdı ıcı uzaklıkta ıydınlarında olmadı ıdına oldu ıbbi'nin ölü müne neden oldu ılar da ıfızıları ıvrupa'daki ı vuruldu ı dörttü ı hale ıda ı sırağının ölümünü neden oldu"
     },
     {
       "ref": "romantizm goethe fichte ve schlegel gibi yazarlardan geçen geniş bir kültürel determinizm özelliği taşıyordu",
-      "pred": "romantizin göte pihte ve şile gel gibi yazarlarından geçen geniş bir kültürel determininizin özelleyi taşıyordu."
+      "pred": "romantizin göte pihte ve şile gel gibi yazarlardan geçen geniş bir kültürel determinizin özelliği taşıyordu. ıfırlıdırdı. ıncılıklarının sonucu ıvrupa'nın hızallığı taşıyardı. ısıtasıydı ıtı. ısınıdı ışındı vurulda ıcı ıcılar'dan ıdırdı ıdağıları da ıdı. roma antizm götü pikte ve şale gel gibi yazarlardan geçen çoğu kültürlerden geçen yeniç bir küntürel getirmenizi'nin özelliğiği taşıydu. ım an't izim göte pişti ve şilagelgi bir yazarlarda geçen gelen. cidminizmini tanış bir küttüreldeterminizin özerliği taşiyı oldu. ılar du.  ulusuncu zayı düzül kum soktirmeyi ıksızı sınc tozikalı ı sırağ nıc"
     },
     {
       "ref": "japonya'nın nükleer ajansına göre tesiste radyoaktif sezyum ve iyodin tespit edildi",
-      "pred": "Japonya'nın nükleer ajansına göre tesiste radioaktif sezrum ve iodin tespit ediller."
+      "pred": "japonya'nın nükleer acasına göre tesis'te radioaktiv sezrüm ve io'dan tespit edilirler. ̇odin tespid edildi. ıcırlıdırdılar da ıcı ıvrimu ve io'nun tespiz etti. ısıtlıydın ve io adim tespat edildiler. ısızlıklığı ıdına göre tesiste radio aktif sezrium ve io d'n tespıt edildti. ılaraktı. ışıklıdırlıdır ve io-dimektir lefede etti."
     },
     {
       "ref": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebiyet veren şeylere ve çevrelerindeki şeylerin onlara belirli şeyleri yapıp yapmamasına sebep olan şeyler ile ilgilenir",
-      "pred": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebi et veren şeylere ve çevredeğindeki şeylerin onlara belirli şeylerini yapıp yapmamasına sebep olan şehirler ile ilgilenir."
+      "pred": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebiyet veren şeylere ve çevredirindeki şeylerin onlara belirli şeyleri yapıp yapmamasına sebep olan şeyler ile ilgilenir. ıcırlıdırlarıyla ilgelenir."
     },
     {
       "ref": "avrupa nispeten küçük ama birçok bağımsız ülkenin bulunduğu bir kıtadır normal şartlar altında birden fazla ülkeyi gezmek birçok vize uygulamalarından ve pasaport kontrollerinden geçmek anlamına gelmektedir",
-      "pred": "avrupa nispeden küçük ama bir çok bağımsız ülkenin bulunduğu bir kıtalılır normal şartlar altında birden fazla ülkeyi gezmek bir çok bize uygulonlarından ve pasaport kontrolüinden geçfek anlamına gelmektedir."
+      "pred": "avrupa nisbeden küçük ama birçok bağımsız ülkenin bulunduğu bir kıtalıdır normal şartlar altında birden fazla ülkeyi gezmek birçoğu vize uygulalarından ve pasaport kontrollerinden geçmek anlamına gelmektedir. ıcırlıdır. ınaklıklarınınak'a ıcı gelir ıvrta ıcreği gezmek birçoch büze uygurgun olanlarından ve passport kontrollerinden geçmeyi anlamına germekteddir ıydılarını geçmektidir ıdınınakası halecek ıbbi zayıcısı ı düzülürümüncü ılarıdırdıkmalarısızı havağı sürdürüleri'ndan ısport kontrollerelerinden geçmesine geçmektenir ıdırıcılık amazıktadırıdır ıcalarağım okumuzukaması ı cahatma ısm tosloruları'a'nın ıksızıc soket"
     }
   ]
 }
