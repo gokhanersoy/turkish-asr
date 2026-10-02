@@ -80,8 +80,15 @@ class MorphoSpeechTrainer:
                 bias="none",
                 task_type=TaskType.SEQ_2_SEQ_LM if self.is_encoder_decoder else TaskType.FEATURE_EXTRACTION
             )
-            self.model = get_peft_model(self.model, peft_config)
-            self.model.print_trainable_parameters()
+            try:
+                self.model = get_peft_model(self.model, peft_config)
+                self.model.print_trainable_parameters()
+            except Exception as e:
+                logger.warning(f"PEFT/LoRA initialization warning ({e}). Falling back to memory-efficient encoder-frozen fine-tuning...")
+                if hasattr(self.model, "model") and hasattr(self.model.model, "encoder"):
+                    for param in self.model.model.encoder.parameters():
+                        param.requires_grad = False
+                    logger.info("Encoder layers frozen for memory efficiency.")
 
         self.model.to(self.device)
 
