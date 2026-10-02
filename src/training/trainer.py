@@ -121,7 +121,9 @@ class MorphoSpeechTrainer:
 
             logger.info(f"\n--- Epoch {epoch}/{epochs} ---")
             
-            step_count = 0
+            # Access underlying model if PEFT-wrapped to prevent keyword argument collisions
+            target_model = self.model.get_base_model() if hasattr(self.model, "get_base_model") else self.model
+
             for idx, sample in enumerate(tqdm(train_dataset, desc=f"Training Epoch {epoch}")):
                 audio_arr = sample["audio"]["array"]
                 sr = sample["audio"].get("sampling_rate", 16000)
@@ -134,10 +136,10 @@ class MorphoSpeechTrainer:
                     labels = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
                     # Replace pad token with -100 for loss computation
                     labels[labels == self.processor.tokenizer.pad_token_id] = -100
-                    outputs = self.model(input_features=inputs.input_features, labels=labels)
+                    outputs = target_model(input_features=inputs.input_features, labels=labels)
                 else:
                     labels = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
-                    outputs = self.model(input_values=inputs.input_values, labels=labels)
+                    outputs = target_model(input_values=inputs.input_values, labels=labels)
 
                 loss = outputs.loss / self.grad_accum_steps
                 loss.backward()
@@ -168,6 +170,7 @@ class MorphoSpeechTrainer:
     def evaluate_validation(self, val_dataset, text_column: str = "transcription") -> float:
         self.model.eval()
         refs, preds = [], []
+        target_model = self.model.get_base_model() if hasattr(self.model, "get_base_model") else self.model
 
         with torch.no_grad():
             for sample in val_dataset:
@@ -178,10 +181,10 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
-                    predicted_ids = self.model.generate(inputs.input_features, language="turkish", task="transcribe")
+                    predicted_ids = target_model.generate(inputs.input_features, language="turkish", task="transcribe")
                     pred_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
                 else:
-                    logits = self.model(inputs.input_values).logits
+                    logits = target_model(inputs.input_values).logits
                     predicted_ids = torch.argmax(logits, dim=-1)
                     pred_text = self.processor.batch_decode(predicted_ids)[0]
 
