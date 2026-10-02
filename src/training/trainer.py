@@ -60,7 +60,12 @@ class MorphoSpeechTrainer:
         
         if "whisper" in model_name.lower():
             self.is_encoder_decoder = True
+            if hasattr(self.processor, "tokenizer"):
+                self.processor.tokenizer.language = "turkish"
+                self.processor.tokenizer.task = "transcribe"
             self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_name)
+            self.model.config.forced_decoder_ids = None
+            self.model.config.suppress_tokens = []
         else:
             self.is_encoder_decoder = False
             self.model = AutoModelForCTC.from_pretrained(model_name)
@@ -158,12 +163,21 @@ class MorphoSpeechTrainer:
             val_wer = self.evaluate_validation(val_dataset, text_column=text_column)
             logger.info(f"Epoch {epoch} Validation WER: {val_wer:.2f}%")
 
-            if val_wer < best_wer:
-                best_wer = val_wer
+            if val_wer < best_wer or epoch == epochs:
+                best_wer = min(best_wer, val_wer)
                 best_dir = os.path.join(self.output_dir, "best_sota_model")
-                self.model.save_pretrained(best_dir)
+                
+                save_model = self.model
+                if hasattr(self.model, "merge_and_unload"):
+                    try:
+                        save_model = self.model.merge_and_unload()
+                    except Exception as e:
+                        logger.warning(f"Could not merge LoRA weights before saving: {e}")
+                        save_model = self.model
+                        
+                save_model.save_pretrained(best_dir)
                 self.processor.save_pretrained(best_dir)
-                logger.info(f"🏆 NEW SOTA CHECKPOINT SAVED TO: {best_dir} (WER: {best_wer:.2f}%)")
+                logger.info(f"🏆 CHECKPOINT SAVED TO: {best_dir} (WER: {val_wer:.2f}%)")
 
         return best_wer
 
@@ -181,7 +195,22 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
-                    predicted_ids = target_model.generate(inputs.input_features, language="turkish", task="transcribe")
+                    try:
+                        forced_ids = self.processor.get_decoder_prompt_ids(language="turkish", task="transcribe")
+                    except Exception:
+                        forced_ids = None
+                    gen_kwargs = {
+                        "max_new_tokens": 256,
+                        "no_repeat_ngram_size": 3,
+                        "repetition_penalty": 1.2
+                    }
+                    if forced_ids:
+                        gen_kwargs["forced_decoder_ids"] = forced_ids
+                    else:
+                        gen_kwargs["language"] = "turkish"
+                        gen_kwargs["task"] = "transcribe"
+
+                    predicted_ids = target_model.generate(inputs.input_features, **gen_kwargs)
                     pred_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
                 else:
                     logits = target_model(inputs.input_values).logits

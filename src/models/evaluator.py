@@ -83,7 +83,17 @@ class TurkishASREvaluator:
         with torch.no_grad():
             if self.is_encoder_decoder:
                 input_features = inputs.input_features.to(self.device)
-                gen_kwargs = {"forced_decoder_ids": self.forced_decoder_ids} if self.forced_decoder_ids else {"language": self.language, "task": "transcribe"}
+                gen_kwargs = {
+                    "max_new_tokens": 256,
+                    "no_repeat_ngram_size": 3,
+                    "repetition_penalty": 1.2
+                }
+                if self.forced_decoder_ids:
+                    gen_kwargs["forced_decoder_ids"] = self.forced_decoder_ids
+                else:
+                    gen_kwargs["language"] = self.language
+                    gen_kwargs["task"] = "transcribe"
+                    
                 predicted_ids = self.model.generate(
                     input_features, 
                     **gen_kwargs
