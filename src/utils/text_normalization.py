@@ -8,10 +8,36 @@ import re
 import string
 
 
+def turkish_num2words(n: int) -> str:
+    """Converts a non-negative integer to its Turkish word representation."""
+    if n == 0:
+        return "sıfır"
+    units = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"]
+    tens = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"]
+    
+    if n < 10:
+        return units[n]
+    if n < 100:
+        t, u = divmod(n, 10)
+        return (tens[t] + " " + units[u]).strip()
+    if n < 1000:
+        h, r = divmod(n, 100)
+        prefix = "yüz" if h == 1 else f"{units[h]} yüz"
+        rem = turkish_num2words(r) if r > 0 else ""
+        return (prefix + " " + rem).strip()
+    if n < 1000000:
+        k, r = divmod(n, 1000)
+        prefix = "bin" if k == 1 else f"{turkish_num2words(k)} bin"
+        rem = turkish_num2words(r) if r > 0 else ""
+        return (prefix + " " + rem).strip()
+    return str(n)
+
+
 class TurkishTextNormalizer:
-    def __init__(self, remove_punctuation: bool = True, lowercase: bool = True):
+    def __init__(self, remove_punctuation: bool = True, lowercase: bool = True, convert_numbers: bool = True):
         self.remove_punctuation = remove_punctuation
         self.lowercase = lowercase
+        self.convert_numbers = convert_numbers
 
     @staticmethod
     def turkish_lowercase(text: str) -> str:
@@ -35,12 +61,16 @@ class TurkishTextNormalizer:
         if self.lowercase:
             text = self.turkish_lowercase(text)
 
-        # 2. Punctuation removal
+        # 2. Number to words conversion (e.g., '17' -> 'on yedi')
+        if self.convert_numbers:
+            text = re.sub(r'\b\d+\b', lambda m: turkish_num2words(int(m.group(0))), text)
+
+        # 3. Punctuation removal
         if self.remove_punctuation:
             # Remove punctuation keeping turkish characters (ç, ğ, ı, ö, ş, ü) intact
             text = re.sub(r'[^\w\s]', '', text)
 
-        # 3. Collapse multiple whitespaces
+        # 4. Collapse multiple whitespaces
         text = re.sub(r'\s+', ' ', text).strip()
 
         return text

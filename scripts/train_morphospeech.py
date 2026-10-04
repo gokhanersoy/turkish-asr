@@ -28,8 +28,8 @@ def main():
     parser.add_argument(
         "--model", 
         type=str, 
-        default="openai/whisper-small", 
-        help="Model ID (openai/whisper-small, openai/whisper-large-v3, facebook/wav2vec2-xls-r-300m)"
+        default="openai/whisper-large-v3", 
+        help="Model ID (openai/whisper-large-v3, openai/whisper-small, facebook/wav2vec2-xls-r-300m)"
     )
     parser.add_argument(
         "--dataset", 
