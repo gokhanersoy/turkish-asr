@@ -104,17 +104,30 @@ class MorphoSpeechLLM(nn.Module):
 
     def forward(
         self,
-        input_features: torch.Tensor,
+        input_features: Optional[torch.Tensor] = None,
         labels: Optional[torch.Tensor] = None,
-        return_dict: bool = True,
+        decoder_input_ids: Optional[torch.Tensor] = None,
+        return_dict: Optional[bool] = True,
+        **kwargs,
     ) -> Union[Tuple[torch.Tensor], Dict[str, torch.Tensor]]:
-        # Single-pass forward execution over base/peft model
-        outputs = self.model(
-            input_features=input_features,
-            labels=labels,
-            output_hidden_states=True,
-            return_dict=True,
-        )
+        # Remove duplicate keys from kwargs to avoid PEFT/Whisper keyword conflicts
+        kwargs.pop("input_features", None)
+        kwargs.pop("labels", None)
+        kwargs.pop("decoder_input_ids", None)
+        kwargs.pop("input_ids", None)
+
+        forward_kwargs = {
+            "output_hidden_states": True,
+            "return_dict": True,
+        }
+        if input_features is not None:
+            forward_kwargs["input_features"] = input_features
+        if labels is not None:
+            forward_kwargs["labels"] = labels
+        if decoder_input_ids is not None:
+            forward_kwargs["decoder_input_ids"] = decoder_input_ids
+
+        outputs = self.model(**forward_kwargs, **kwargs)
 
         hidden_states = getattr(outputs, "encoder_last_hidden_state", None)
         if hidden_states is None and hasattr(outputs, "encoder_hidden_states") and outputs.encoder_hidden_states:
