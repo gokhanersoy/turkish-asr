@@ -10,7 +10,6 @@ import torch.nn as nn
 from transformers import (
     WhisperForConditionalGeneration,
     WhisperProcessor,
-    PreTrainedModel,
 )
 from peft import LoraConfig, get_peft_model, TaskType
 
@@ -93,27 +92,38 @@ class MorphoSpeechLLM(nn.Module):
             self.model = get_peft_model(self.model, peft_config)
             self.model.print_trainable_parameters()
 
+    def get_encoder(self):
+        """Safely retrieve the speech encoder regardless of PEFT wrapper hierarchy."""
+        if hasattr(self.model, "get_encoder"):
+            return self.model.get_encoder()
+        elif hasattr(self.model, "base_model") and hasattr(self.model.base_model, "get_encoder"):
+            return self.model.base_model.get_encoder()
+        elif hasattr(self.model, "model") and hasattr(self.model.model, "encoder"):
+            return self.model.model.encoder
+        return getattr(self.model, "encoder", None)
+
     def forward(
         self,
         input_features: torch.Tensor,
         labels: Optional[torch.Tensor] = None,
         return_dict: bool = True,
     ) -> Union[Tuple[torch.Tensor], Dict[str, torch.Tensor]]:
-        # Encoder forward pass
-        encoder_outputs = self.model.model.encoder(input_features)
-        hidden_states = encoder_outputs.last_hidden_state
-
-        # Decoder forward pass
+        # Single-pass forward execution over base/peft model
         outputs = self.model(
-            encoder_outputs=encoder_outputs,
+            input_features=input_features,
             labels=labels,
-            return_dict=return_dict,
+            output_hidden_states=True,
+            return_dict=True,
         )
+
+        hidden_states = getattr(outputs, "encoder_last_hidden_state", None)
+        if hidden_states is None and hasattr(outputs, "encoder_hidden_states") and outputs.encoder_hidden_states:
+            hidden_states = outputs.encoder_hidden_states[-1]
 
         loss = outputs.loss if labels is not None else None
 
         # Compute Auxiliary CTC Loss if labels are provided during training
-        if labels is not None and self.ctc_weight > 0.0:
+        if labels is not None and self.ctc_weight > 0.0 and hidden_states is not None:
             ctc_logits = self.aux_ctc_head(hidden_states)
             log_probs = torch.log_softmax(ctc_logits, dim=-1).transpose(0, 1) # [seq_len, batch_size, vocab_size]
 
