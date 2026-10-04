@@ -88,7 +88,7 @@ class MorphoSpeechLLM(nn.Module):
                 target_modules=target_modules,
                 lora_dropout=lora_dropout,
                 bias="none",
-                task_type=TaskType.FEATURE_EXTRACTION,
+                task_type=TaskType.SEQ_2_SEQ_LM,
             )
             self.model = get_peft_model(self.model, peft_config)
             self.model.print_trainable_parameters()
