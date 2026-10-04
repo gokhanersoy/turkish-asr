@@ -5,7 +5,7 @@ Unit tests for Turkish ASR Normalizer and Morphological Tokenizer.
 import os
 import unittest
 from src.utils.text_normalization import normalize_turkish_text
-from src.tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer
+from src.morpho_tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer
 
 class TestTurkishASR(unittest.TestCase):
     def test_turkish_text_normalization(self):

@@ -18,7 +18,7 @@ import argparse
 import logging
 
 from src.asr_datasets.loader import TurkishDatasetLoader
-from src.tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer
+from src.morpho_tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

@@ -8,9 +8,10 @@ import shutil
 import sys
 import torch
 
-# Auto-cleanup legacy src/datasets directory if present to prevent Hugging Face datasets module shadowing
-if os.path.exists("src/datasets"):
-    shutil.rmtree("src/datasets", ignore_errors=True)
+# Auto-cleanup legacy folders if present to prevent Hugging Face datasets and tokenizers module shadowing
+for legacy_dir in ["src/datasets", "src/tokenizers", "src/tokenizer"]:
+    if os.path.exists(legacy_dir):
+        shutil.rmtree(legacy_dir, ignore_errors=True)
 
 import evaluate
 from transformers import (
@@ -21,7 +22,7 @@ from transformers import (
 
 from src.models.morpho_speech_llm import MorphoSpeechLLM
 from src.data.dataset_loader import TurkishASRDatasetLoader, DataCollatorSpeechSeq2SeqWithPadding
-from src.tokenizer.morpho_tokenizer import MorphoTokenizer
+from src.asr_tokenizer.morpho_tokenizer import MorphoTokenizer
 from src.utils.metrics import compute_wer_cer
 from src.utils.text_normalizer import TurkishTextNormalizer
 

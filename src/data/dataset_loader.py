@@ -17,7 +17,7 @@ except ImportError:
     load_dataset = None
 
 from src.utils.text_normalizer import TurkishTextNormalizer
-from src.tokenizer.morpho_tokenizer import MorphoTokenizer
+from src.asr_tokenizer.morpho_tokenizer import MorphoTokenizer
 
 logger = logging.getLogger(__name__)
 

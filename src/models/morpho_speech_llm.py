@@ -14,7 +14,7 @@ from transformers import (
 )
 from peft import LoraConfig, get_peft_model, TaskType
 
-from src.tokenizer.morpho_tokenizer import MorphoTokenizer
+from src.asr_tokenizer.morpho_tokenizer import MorphoTokenizer
 
 
 class AuxiliaryCTCHead(nn.Module):
