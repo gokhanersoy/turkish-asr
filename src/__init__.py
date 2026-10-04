@@ -1,4 +1,5 @@
 """
-Turkish ASR Framework Core Package.
+MorphoSpeech-LLM: A Morphology-Aware Audio-LLM Framework for State-of-the-Art Turkish Automatic Speech Recognition.
 """
-__version__ = "0.1.0"
+
+__version__ = "1.0.0"

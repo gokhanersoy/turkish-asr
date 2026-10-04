@@ -1,17 +1,24 @@
-# Turkish ASR Core Dependencies
-torch>=2.0.0
-torchaudio>=2.0.0
+# Core ML & Deep Learning
+torch>=2.1.0
+torchaudio>=2.1.0
 transformers>=4.38.0
-datasets[audio]<3.0.0
+datasets[audio]>=2.18.0
+accelerate>=0.27.0
+peft>=0.9.0
+bitsandbytes>=0.42.0
+
+# Turkish NLP & Morphological Segmentation
+morfessor>=2.0.6
+subword-nmt>=0.3.8
+
+# Evaluation & Metrics
 evaluate>=0.4.1
 jiwer>=3.0.3
 librosa>=0.10.1
 soundfile>=0.12.1
-accelerate>=0.27.0
-peft>=0.10.0
-optimum>=1.17.0
+
+# Utilities
 tqdm>=4.66.0
-pandas>=2.0.0
-morfessor>=2.0.6
-sentencepiece>=0.2.0
-numba
+pandas>=2.1.0
+numpy>=1.26.0
+pyyaml>=6.0.1

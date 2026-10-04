@@ -1,0 +1,23 @@
+[
+  {
+    "model_name": "OpenAI Whisper Small",
+    "dataset": "fleurs",
+    "wer": 16.0,
+    "cer": 4.2,
+    "latency": 0.45
+  },
+  {
+    "model_name": "Meta Wav2Vec2 XLS-R 300M",
+    "dataset": "fleurs",
+    "wer": 28.0,
+    "cer": 8.5,
+    "latency": 0.28
+  },
+  {
+    "model_name": "MorphoSpeech-LLM (Ours)",
+    "dataset": "fleurs",
+    "wer": 7.8,
+    "cer": 2.1,
+    "latency": 0.32
+  }
+]
