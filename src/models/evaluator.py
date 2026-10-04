@@ -82,7 +82,7 @@ class TurkishASREvaluator:
         
         with torch.no_grad():
             if self.is_encoder_decoder:
-                input_features = inputs.input_features.to(self.device)
+                input_features = inputs.input_features.to(self.device, dtype=self.model.dtype)
                 gen_kwargs = {
                     "max_new_tokens": 256,
                     "no_repeat_ngram_size": 3,

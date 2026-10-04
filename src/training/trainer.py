@@ -138,13 +138,14 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
+                    input_features = inputs.input_features.to(dtype=target_model.dtype)
                     full_tokens = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
                     # Align decoder_input_ids and labels perfectly to prevent position shift / EOS hallucination
                     decoder_input_ids = full_tokens[:, :-1]
                     labels = full_tokens[:, 1:].clone()
                     labels[labels == self.processor.tokenizer.pad_token_id] = -100
                     outputs = target_model(
-                        input_features=inputs.input_features, 
+                        input_features=input_features, 
                         decoder_input_ids=decoder_input_ids,
                         labels=labels
                     )
@@ -201,6 +202,7 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
+                    input_features = inputs.input_features.to(dtype=target_model.dtype)
                     try:
                         forced_ids = self.processor.get_decoder_prompt_ids(language="turkish", task="transcribe")
                     except Exception:
@@ -216,7 +218,7 @@ class MorphoSpeechTrainer:
                         gen_kwargs["language"] = "turkish"
                         gen_kwargs["task"] = "transcribe"
 
-                    predicted_ids = target_model.generate(inputs.input_features, **gen_kwargs)
+                    predicted_ids = target_model.generate(input_features, **gen_kwargs)
                     pred_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
                 else:
                     logits = target_model(inputs.input_values).logits
