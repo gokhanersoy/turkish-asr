@@ -4,7 +4,14 @@ Training and Evaluation Pipeline for MorphoSpeech-LLM on Turkish Datasets (Commo
 
 import argparse
 import os
+import shutil
+import sys
 import torch
+
+# Auto-cleanup legacy src/datasets directory if present to prevent Hugging Face datasets module shadowing
+if os.path.exists("src/datasets"):
+    shutil.rmtree("src/datasets", ignore_errors=True)
+
 import evaluate
 from transformers import (
     Seq2SeqTrainer,
