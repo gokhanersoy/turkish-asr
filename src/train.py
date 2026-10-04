@@ -126,7 +126,7 @@ def main():
         num_train_epochs=args.num_train_epochs,
         gradient_checkpointing=True,
         fp16=args.fp16 and torch.cuda.is_available(),
-        evaluation_strategy="epoch" if train_dataset else "no",
+        eval_strategy="epoch" if train_dataset else "no",
         save_strategy="epoch" if train_dataset else "no",
         predict_with_generate=True,
         generation_max_length=225,
