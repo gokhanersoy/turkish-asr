@@ -30,8 +30,8 @@ from src.utils.text_normalizer import TurkishTextNormalizer
 def parse_args():
     parser = argparse.ArgumentParser(description="Train and Evaluate MorphoSpeech-LLM for Turkish ASR")
     parser.add_argument("--model_name_or_path", type=str, default="openai/whisper-large-v3", help="Base model identifier")
-    parser.add_argument("--dataset_name", type=str, default="mozilla-foundation/common_voice_13_0", help="Dataset name on Hugging Face")
-    parser.add_argument("--dataset_config", type=str, default="tr", help="Dataset language config code")
+    parser.add_argument("--dataset_name", type=str, default="google/fleurs", help="Dataset name on Hugging Face")
+    parser.add_argument("--dataset_config", type=str, default="tr_tr", help="Dataset language config code")
     parser.add_argument("--output_dir", type=str, default="./checkpoints/morpho_speech_llm", help="Directory to save checkpoints")
     parser.add_argument("--per_device_train_batch_size", type=int, default=8, help="Train batch size per GPU")
     parser.add_argument("--per_device_eval_batch_size", type=int, default=8, help="Eval batch size per GPU")
@@ -69,7 +69,7 @@ def main():
         morpho_tokenizer=morpho_tokenizer,
     )
 
-    eval_dataset = data_loader.load_common_voice(split="test", max_samples=args.max_eval_samples)
+    eval_dataset = data_loader.load_dataset_split(split="test", max_samples=args.max_eval_samples)
     print(f"Loaded {len(eval_dataset)} test samples for evaluation.")
 
     eval_dataset = eval_dataset.map(
@@ -80,7 +80,7 @@ def main():
 
     train_dataset = None
     if not args.eval_only:
-        train_dataset = data_loader.load_common_voice(split="train")
+        train_dataset = data_loader.load_dataset_split(split="train")
         train_dataset = train_dataset.map(
             lambda b: data_loader.prepare_sample(b, processor),
             remove_columns=train_dataset.column_names,

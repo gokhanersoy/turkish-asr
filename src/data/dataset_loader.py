@@ -1,7 +1,7 @@
 """
-Dataset Loader and Data Collator for Turkish ASR (Common Voice & FLEURS).
+Dataset Loader and Data Collator for Turkish ASR (Google FLEURS & Mozilla Common Voice).
 Handles audio resampling to 16kHz, text normalization, morpho-tokenization, and batch collation.
-Includes automatic fallback from gated Common Voice to ungated Google FLEURS.
+Uses Google FLEURS Turkish ('google/fleurs', 'tr_tr') as the primary open benchmark dataset.
 """
 
 from dataclasses import dataclass
@@ -24,14 +24,14 @@ logger = logging.getLogger(__name__)
 
 class TurkishASRDatasetLoader:
     """
-    Unified dataset loader for Turkish ASR benchmarks (Common Voice & FLEURS).
-    Automatically handles gated Common Voice datasets and falls back to ungated Google FLEURS if needed.
+    Unified dataset loader for Turkish ASR benchmarks.
+    Defaults to Google FLEURS Turkish ('google/fleurs', 'tr_tr') as primary open dataset.
     """
 
     def __init__(
         self,
-        dataset_name: str = "mozilla-foundation/common_voice_13_0",
-        language_code: str = "tr",
+        dataset_name: str = "google/fleurs",
+        language_code: str = "tr_tr",
         sampling_rate: int = 16000,
         morpho_tokenizer: MorphoTokenizer = None,
         hf_token: str = None,
@@ -43,10 +43,9 @@ class TurkishASRDatasetLoader:
         self.morpho_tokenizer = morpho_tokenizer or MorphoTokenizer(normalizer=self.normalizer)
         self.hf_token = hf_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
 
-    def load_common_voice(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
+    def load_dataset_split(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
         """
-        Load Mozilla Common Voice Turkish dataset split.
-        Falls back to Google FLEURS ('google/fleurs', 'tr_tr') if gated dataset access fails.
+        Load dataset split for Turkish ASR (defaults to Google FLEURS 'tr_tr').
         """
         if load_dataset is None:
             raise ImportError("HuggingFace `datasets` package is required.")
@@ -58,18 +57,19 @@ class TurkishASRDatasetLoader:
             kwargs["token"] = self.hf_token
 
         try:
-            logger.info(f"Attempting to load {self.dataset_name} (split={split})...")
+            logger.info(f"Loading {self.dataset_name} ({self.language_code}, split={split})...")
             dataset = load_dataset(self.dataset_name, self.language_code, **kwargs)
             dataset = dataset.cast_column("audio", Audio(sampling_rate=self.sampling_rate))
             if not streaming and max_samples and max_samples < len(dataset):
                 dataset = dataset.select(range(max_samples))
             return dataset
         except Exception as e:
-            logger.warning(
-                f"Could not load {self.dataset_name} ({e}). "
-                "Falling back to ungated Google FLEURS Turkish ('google/fleurs', 'tr_tr')..."
-            )
+            logger.warning(f"Could not load {self.dataset_name} ({e}). Attempting fallback to Google FLEURS ('google/fleurs', 'tr_tr')...")
             return self.load_fleurs(split=split, max_samples=max_samples, streaming=streaming)
+
+    def load_common_voice(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
+        """Compatibility wrapper calling load_dataset_split."""
+        return self.load_dataset_split(split=split, max_samples=max_samples, streaming=streaming)
 
     def load_fleurs(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
         """Load Google FLEURS Turkish dataset split."""
@@ -98,7 +98,7 @@ class TurkishASRDatasetLoader:
     def prepare_sample(self, batch: Dict[str, Any], processor: Any) -> Dict[str, Any]:
         """Preprocess audio array and text transcript for model consumption."""
         audio = batch["audio"]
-        text = batch.get("sentence") or batch.get("transcription") or batch.get("text") or batch.get("raw_transcription") or ""
+        text = batch.get("transcription") or batch.get("raw_transcription") or batch.get("sentence") or batch.get("text") or ""
 
         # 1. Turkish Normalization
         norm_text = self.normalizer(text)
