@@ -144,3 +144,13 @@ class MorphoSpeechLLM(nn.Module):
     def generate(self, input_features: torch.Tensor, **kwargs) -> torch.Tensor:
         """Generate predicted transcript token IDs."""
         return self.model.generate(input_features=input_features, **kwargs)
+
+    def gradient_checkpointing_enable(self, **kwargs):
+        """Delegate gradient checkpointing enablement to inner base model."""
+        if hasattr(self.model, "gradient_checkpointing_enable"):
+            self.model.gradient_checkpointing_enable(**kwargs)
+
+    def gradient_checkpointing_disable(self):
+        """Delegate gradient checkpointing disablement to inner base model."""
+        if hasattr(self.model, "gradient_checkpointing_disable"):
+            self.model.gradient_checkpointing_disable()
