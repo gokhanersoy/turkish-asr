@@ -55,16 +55,43 @@ class TurkishASREvaluator:
         except Exception:
             self.is_encoder_decoder = "whisper" in model_name_or_path.lower()
         
+        # Check if model_name_or_path points to an unmerged PEFT adapter directory
+        import os
+        is_peft_adapter = os.path.isdir(model_name_or_path) and os.path.exists(os.path.join(model_name_or_path, "adapter_config.json"))
+
+        if is_peft_adapter:
+            try:
+                from peft import PeftConfig, PeftModel
+                peft_config = PeftConfig.from_pretrained(model_name_or_path)
+                base_model_name = peft_config.base_model_name_or_path
+                logger.info(f"Detected PEFT adapter directory. Loading base model '{base_model_name}'...")
+                
+                if self.is_encoder_decoder:
+                    base_model = AutoModelForSpeechSeq2Seq.from_pretrained(base_model_name)
+                else:
+                    base_model = AutoModelForCTC.from_pretrained(base_model_name)
+                    
+                peft_model = PeftModel.from_pretrained(base_model, model_name_or_path)
+                self.model = peft_model.merge_and_unload()
+                logger.info("Successfully loaded and merged PEFT adapter into base model.")
+            except Exception as e:
+                logger.warning(f"PEFT adapter load failed ({e}), falling back to standard loader...")
+                if self.is_encoder_decoder:
+                    self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_name_or_path)
+                else:
+                    self.model = AutoModelForCTC.from_pretrained(model_name_or_path)
+        else:
+            if self.is_encoder_decoder:
+                self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_name_or_path)
+            else:
+                self.model = AutoModelForCTC.from_pretrained(model_name_or_path)
+
         if self.is_encoder_decoder:
-            self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_name_or_path)
-            # Setup Turkish forced decoder prompt IDs for Whisper
             try:
                 self.forced_decoder_ids = self.processor.get_decoder_prompt_ids(language=self.language, task="transcribe")
             except Exception:
                 self.forced_decoder_ids = None
         else:
-            self.is_encoder_decoder = False
-            self.model = AutoModelForCTC.from_pretrained(model_name_or_path)
             self.forced_decoder_ids = None
             
         self.model.to(self.device)
