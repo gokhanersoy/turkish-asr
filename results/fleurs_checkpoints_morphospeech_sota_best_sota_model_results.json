@@ -1,29 +1,29 @@
 {
   "model_name": "checkpoints/morphospeech_sota/best_sota_model",
   "sample_count": 50,
-  "wer_percentage": 32.87,
-  "cer_percentage": 14.41,
-  "avg_latency_seconds": 0.684,
+  "wer_percentage": 100.0,
+  "cer_percentage": 87.41,
+  "avg_latency_seconds": 8.554,
   "predictions_sample": [
     {
       "ref": "aynı ay başka bir yolcu uçağı meşhed'deki bir pisti aşarak bir duvara çarptı ve on yedi kişinin ölümüne neden oldu",
-      "pred": "ayna ay başka bir yolcu uçları meşetteki bir piste aşarak 1 duvara çarptı ve 17 kişinin ölümüne neden oldu."
+      "pred": "!!!$!!%!!&!!'!!,!!-!!.!!0!!1!!2!!3!!4!!5!!6!!7!!8!!9!!?!!A!!B!!C!!D!!E!!F!!G!!H!!I!!J!!K!!L!!M!!N!!O!!P!!Q!!R!!S!!T!!U!!V!!W!!X!!Y!!Z!!a!!b!!c!!d!!e!!f!!g!!h!!i!!j!!k!!l!!m!!n!!o!!p!!q!!r!!s!!t!!u!!v!!w!!x!!y!!z!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�"
     },
     {
       "ref": "romantizm goethe fichte ve schlegel gibi yazarlardan geçen geniş bir kültürel determinizm özelliği taşıyordu",
-      "pred": "romantizm göte pihte ve şle gel gibi yazarlardan geçen geniş bir kültürel determinizin özelliği taşıyordu."
+      "pred": "!!!$!!%!!&!!'!!,!!-!!.!!0!!1!!2!!3!!4!!5!!6!!7!!8!!9!!?!!A!!B!!C!!D!!E!!F!!G!!H!!I!!J!!K!!L!!M!!N!!O!!P!!Q!!R!!S!!T!!U!!V!!W!!X!!Y!!Z!!a!!b!!c!!d!!e!!f!!g!!h!!i!!j!!k!!l!!m!!n!!o!!p!!q!!r!!s!!t!!u!!v!!w!!x!!y!!z!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�"
     },
     {
       "ref": "japonya'nın nükleer ajansına göre tesiste radyoaktif sezyum ve iyodin tespit edildi",
-      "pred": "japonya'nın nükleer acasına göre tesis'te radio aktif sezrüm ve io'dan tespit edildi."
+      "pred": "!!!$!!%!!&!!'!!,!!-!!.!!0!!1!!2!!3!!4!!5!!6!!7!!8!!9!!?!!A!!B!!C!!D!!E!!F!!G!!H!!I!!J!!K!!L!!M!!N!!O!!P!!Q!!R!!S!!T!!U!!V!!W!!X!!Y!!Z!!a!!b!!c!!d!!e!!f!!g!!h!!i!!j!!k!!l!!m!!n!!o!!p!!q!!r!!s!!t!!u!!v!!w!!x!!y!!z!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�"
     },
     {
       "ref": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebiyet veren şeylere ve çevrelerindeki şeylerin onlara belirli şeyleri yapıp yapmamasına sebep olan şeyler ile ilgilenir",
-      "pred": "bu teoriler bazı insanların yaptıkları şeyleri arzu etmelerine sebebiyet veren şeylere ve çevrelerindeki şeylerin onlara belirli şeyleri yapıp yapmamasına sebep olan şeylerle ilgilenir. ırtlıdır."
+      "pred": "!!!$!!%!!&!!'!!,!!-!!.!!0!!1!!2!!3!!4!!5!!6!!7!!8!!9!!?!!A!!B!!C!!D!!E!!F!!G!!H!!I!!J!!K!!L!!M!!N!!O!!P!!Q!!R!!S!!T!!U!!V!!W!!X!!Y!!Z!!a!!b!!c!!d!!e!!f!!g!!h!!i!!j!!k!!l!!m!!n!!o!!p!!q!!r!!s!!t!!u!!v!!w!!x!!y!!z!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�"
     },
     {
       "ref": "avrupa nispeten küçük ama birçok bağımsız ülkenin bulunduğu bir kıtadır normal şartlar altında birden fazla ülkeyi gezmek birçok vize uygulamalarından ve pasaport kontrollerinden geçmek anlamına gelmektedir",
-      "pred": "avrupa nisbeden küçük ama birçok bağımsız ülkenin bulunduğu bir kıtalıdır normal şartlar altında birden fazla ülkeyi gezmek birçoğu bize uygulamalarından ve pasaport kontrollerinden geçmek anlamına gelmektedir."
+      "pred": "!!!$!!%!!&!!'!!,!!-!!.!!0!!1!!2!!3!!4!!5!!6!!7!!8!!9!!?!!A!!B!!C!!D!!E!!F!!G!!H!!I!!J!!K!!L!!M!!N!!O!!P!!Q!!R!!S!!T!!U!!V!!W!!X!!Y!!Z!!a!!b!!c!!d!!e!!f!!g!!h!!i!!j!!k!!l!!m!!n!!o!!p!!q!!r!!s!!t!!u!!v!!w!!x!!y!!z!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�!!�"
     }
   ]
 }
