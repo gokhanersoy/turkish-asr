@@ -54,8 +54,9 @@ flowchart TD
 
 ```
 .
+├── notebooks/
+│   └── MorphoSpeech_LLM_Training_and_Evaluation.ipynb  # Google Colab Notebook (A100 GPU Ready)
 ├── README.md                                # Project Documentation & SOTA Benchmark
-├── MorphoSpeech_LLM_Training_and_Evaluation.ipynb  # Google Colab Notebook (A100 GPU Ready)
 ├── requirements.txt                          # Project Dependencies
 └── src/
     ├── tokenizer/
@@ -100,7 +101,7 @@ python src/train.py \
 ```
 
 ### 3. Google Colab Execution (A100 GPU)
-Open `MorphoSpeech_LLM_Training_and_Evaluation.ipynb` in Google Colab, select **A100 GPU** in Runtime settings, and execute all cells.
+Open `notebooks/MorphoSpeech_LLM_Training_and_Evaluation.ipynb` in Google Colab, select **A100 GPU** in Runtime settings, and execute all cells.
 
 ---
 
