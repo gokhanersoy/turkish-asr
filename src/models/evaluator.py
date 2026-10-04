@@ -87,6 +87,9 @@ class TurkishASREvaluator:
                 self.model = AutoModelForCTC.from_pretrained(model_name_or_path)
 
         if self.is_encoder_decoder:
+            self.model.config.forced_decoder_ids = None
+            self.model.config.suppress_tokens = []
+            # Setup Turkish forced decoder prompt IDs for Whisper
             try:
                 self.forced_decoder_ids = self.processor.get_decoder_prompt_ids(language=self.language, task="transcribe")
             except Exception:

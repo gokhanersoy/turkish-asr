@@ -126,8 +126,7 @@ class MorphoSpeechTrainer:
 
             logger.info(f"\n--- Epoch {epoch}/{epochs} ---")
             
-            # Access underlying model if PEFT-wrapped to prevent keyword argument collisions
-            target_model = self.model.get_base_model() if hasattr(self.model, "get_base_model") else self.model
+            model_dtype = next(self.model.parameters()).dtype
 
             for idx, sample in enumerate(tqdm(train_dataset, desc=f"Training Epoch {epoch}")):
                 audio_arr = sample["audio"]["array"]
@@ -138,17 +137,23 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
-                    model_dtype = getattr(self.model, "dtype", torch.float32)
                     input_features = inputs.input_features.to(dtype=model_dtype)
-                    labels = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
+                    full_tokens = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
+                    # Align decoder_input_ids and labels perfectly to prevent position shift / EOS hallucination
+                    decoder_input_ids = full_tokens[:, :-1]
+                    labels = full_tokens[:, 1:].clone()
+                    # Mask prompt prefix tokens so loss is strictly evaluated on target text
+                    labels[:, :3] = -100
                     labels[labels == self.processor.tokenizer.pad_token_id] = -100
                     outputs = self.model(
                         input_features=input_features, 
+                        decoder_input_ids=decoder_input_ids,
                         labels=labels
                     )
                 else:
                     labels = self.processor.tokenizer(text=target_text, return_tensors="pt").input_ids.to(self.device)
-                    outputs = self.model(input_values=inputs.input_values, labels=labels)
+                    input_vals = inputs.input_values.to(dtype=model_dtype) if hasattr(inputs, "input_values") else inputs.input_features.to(dtype=model_dtype)
+                    outputs = self.model(input_values=input_vals, labels=labels)
 
                 loss = outputs.loss / self.grad_accum_steps
                 loss.backward()
@@ -171,15 +176,13 @@ class MorphoSpeechTrainer:
                 best_wer = min(best_wer, val_wer)
                 best_dir = os.path.join(self.output_dir, "best_sota_model")
                 
-                if self.use_lora and hasattr(self.model, "merge_and_unload"):
+                save_model = self.model
+                if hasattr(self.model, "merge_and_unload"):
                     try:
                         save_model = self.model.merge_and_unload()
-                        logger.info("Successfully merged LoRA weights into base model before saving.")
                     except Exception as e:
-                        logger.warning(f"Could not merge LoRA weights before saving ({e}). Saving adapter directly.")
+                        logger.warning(f"Could not merge LoRA weights before saving: {e}")
                         save_model = self.model
-                else:
-                    save_model = self.model
                         
                 save_model.save_pretrained(best_dir)
                 self.processor.save_pretrained(best_dir)
@@ -190,6 +193,7 @@ class MorphoSpeechTrainer:
     def evaluate_validation(self, val_dataset, text_column: str = "transcription") -> float:
         self.model.eval()
         refs, preds = [], []
+        model_dtype = next(self.model.parameters()).dtype
 
         with torch.no_grad():
             for sample in val_dataset:
@@ -200,7 +204,6 @@ class MorphoSpeechTrainer:
                 inputs = self.processor(audio_arr, sampling_rate=sr, return_tensors="pt").to(self.device)
                 
                 if self.is_encoder_decoder:
-                    model_dtype = getattr(self.model, "dtype", torch.float32)
                     input_features = inputs.input_features.to(dtype=model_dtype)
                     try:
                         forced_ids = self.processor.get_decoder_prompt_ids(language="turkish", task="transcribe")
@@ -220,7 +223,8 @@ class MorphoSpeechTrainer:
                     predicted_ids = self.model.generate(input_features, **gen_kwargs)
                     pred_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
                 else:
-                    logits = self.model(inputs.input_values).logits
+                    input_vals = inputs.input_values.to(dtype=model_dtype) if hasattr(inputs, "input_values") else inputs.input_features.to(dtype=model_dtype)
+                    logits = self.model(input_vals).logits
                     predicted_ids = torch.argmax(logits, dim=-1)
                     pred_text = self.processor.batch_decode(predicted_ids)[0]
 
