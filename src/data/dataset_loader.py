@@ -51,7 +51,7 @@ class TurkishASRDatasetLoader:
         if load_dataset is None:
             raise ImportError("HuggingFace `datasets` package is required.")
 
-        kwargs = {"split": split, "trust_remote_code": True}
+        kwargs = {"split": split}
         if streaming:
             kwargs["streaming"] = True
         if self.hf_token:
@@ -76,7 +76,7 @@ class TurkishASRDatasetLoader:
         if load_dataset is None:
             raise ImportError("HuggingFace `datasets` package is required.")
 
-        kwargs = {"split": split, "trust_remote_code": True}
+        kwargs = {"split": split}
         if streaming:
             kwargs["streaming"] = True
         if self.hf_token:

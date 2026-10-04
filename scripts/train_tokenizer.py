@@ -17,7 +17,7 @@ if str(ROOT_DIR) not in sys.path:
 import argparse
 import logging
 
-from src.datasets.loader import TurkishDatasetLoader
+from src.asr_datasets.loader import TurkishDatasetLoader
 from src.tokenizers.turkish_morpho_tokenizer import TurkishMorphoTokenizer
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

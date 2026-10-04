@@ -40,7 +40,7 @@ class TurkishDatasetLoader:
         logger.info(
             f"Loading Common Voice Turkish dataset ({version}, split={split}, streaming={streaming})...")
 
-        kwargs = {"split": split, "streaming": streaming, "trust_remote_code": True}
+        kwargs = {"split": split, "streaming": streaming}
         if self.hf_token:
             kwargs["token"] = self.hf_token
 
@@ -75,7 +75,7 @@ class TurkishDatasetLoader:
             raise ImportError(
                 "HuggingFace `datasets` package is required to load audio benchmarks.")
 
-        kwargs = {"split": split, "streaming": streaming, "trust_remote_code": True}
+        kwargs = {"split": split, "streaming": streaming}
         if self.hf_token:
             kwargs["token"] = self.hf_token
 

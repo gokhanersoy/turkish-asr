@@ -18,7 +18,7 @@ import argparse
 import json
 import logging
 
-from src.datasets.loader import TurkishDatasetLoader
+from src.asr_datasets.loader import TurkishDatasetLoader
 from src.models.evaluator import TurkishASREvaluator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
