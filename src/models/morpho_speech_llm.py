@@ -110,12 +110,7 @@ class MorphoSpeechLLM(nn.Module):
         return_dict: Optional[bool] = True,
         **kwargs,
     ) -> Union[Tuple[torch.Tensor], Dict[str, torch.Tensor]]:
-        # Remove duplicate keys from kwargs to avoid PEFT/Whisper keyword conflicts
-        kwargs.pop("input_features", None)
-        kwargs.pop("labels", None)
-        kwargs.pop("decoder_input_ids", None)
-        kwargs.pop("input_ids", None)
-
+        # Clean forward kwargs to eliminate parameter duplication in PEFT/Whisper
         forward_kwargs = {
             "output_hidden_states": True,
             "return_dict": True,
@@ -124,10 +119,11 @@ class MorphoSpeechLLM(nn.Module):
             forward_kwargs["input_features"] = input_features
         if labels is not None:
             forward_kwargs["labels"] = labels
-        if decoder_input_ids is not None:
+        elif decoder_input_ids is not None:
             forward_kwargs["decoder_input_ids"] = decoder_input_ids
 
-        outputs = self.model(**forward_kwargs, **kwargs)
+        # Forward pass over PeftModel / WhisperForConditionalGeneration
+        outputs = self.model(**forward_kwargs)
 
         hidden_states = getattr(outputs, "encoder_last_hidden_state", None)
         if hidden_states is None and hasattr(outputs, "encoder_hidden_states") and outputs.encoder_hidden_states:
