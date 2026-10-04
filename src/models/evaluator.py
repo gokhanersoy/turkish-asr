@@ -157,7 +157,7 @@ class TurkishASREvaluator:
         logger.info(f"Evaluating {len(dataset)} samples with model '{self.model_name}'...")
 
         for sample in tqdm(dataset, desc=f"Evaluating {self.model_name.split('/')[-1]}"):
-            ref_text = sample[text_column]
+            ref_text = sample.get(text_column) or sample.get("sentence") or sample.get("transcription") or sample.get("raw_transcription") or sample.get("text") or ""
             audio_data = sample[audio_column]
             
             # Handle audio dict structure

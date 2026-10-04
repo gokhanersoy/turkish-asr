@@ -1,22 +1,31 @@
 """
 Dataset Loader and Data Collator for Turkish ASR (Common Voice & FLEURS).
 Handles audio resampling to 16kHz, text normalization, morpho-tokenization, and batch collation.
+Includes automatic fallback from gated Common Voice to ungated Google FLEURS.
 """
 
 from dataclasses import dataclass
+import os
+import logging
 from typing import Any, Dict, List, Union
 import torch
 import torchaudio
-from datasets import load_dataset, DatasetDict, Audio
-from transformers import AutoFeatureExtractor, AutoTokenizer, AutoProcessor
+
+try:
+    from datasets import load_dataset, Audio, DatasetDict
+except ImportError:
+    load_dataset = None
 
 from src.utils.text_normalizer import TurkishTextNormalizer
 from src.tokenizer.morpho_tokenizer import MorphoTokenizer
+
+logger = logging.getLogger(__name__)
 
 
 class TurkishASRDatasetLoader:
     """
     Unified dataset loader for Turkish ASR benchmarks (Common Voice & FLEURS).
+    Automatically handles gated Common Voice datasets and falls back to ungated Google FLEURS if needed.
     """
 
     def __init__(
@@ -25,43 +34,71 @@ class TurkishASRDatasetLoader:
         language_code: str = "tr",
         sampling_rate: int = 16000,
         morpho_tokenizer: MorphoTokenizer = None,
+        hf_token: str = None,
     ):
         self.dataset_name = dataset_name
         self.language_code = language_code
         self.sampling_rate = sampling_rate
         self.normalizer = TurkishTextNormalizer()
         self.morpho_tokenizer = morpho_tokenizer or MorphoTokenizer(normalizer=self.normalizer)
+        self.hf_token = hf_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
 
-    def load_common_voice(self, split: str = "test", max_samples: int = None) -> Any:
-        """Load Mozilla Common Voice Turkish dataset split."""
-        dataset = load_dataset(
-            self.dataset_name,
-            self.language_code,
-            split=split,
-            trust_remote_code=True,
-        )
-        dataset = dataset.cast_column("audio", Audio(sampling_rate=self.sampling_rate))
-        if max_samples and max_samples < len(dataset):
-            dataset = dataset.select(range(max_samples))
-        return dataset
+    def load_common_voice(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
+        """
+        Load Mozilla Common Voice Turkish dataset split.
+        Falls back to Google FLEURS ('google/fleurs', 'tr_tr') if gated dataset access fails.
+        """
+        if load_dataset is None:
+            raise ImportError("HuggingFace `datasets` package is required.")
 
-    def load_fleurs(self, split: str = "test", max_samples: int = None) -> Any:
+        kwargs = {"split": split, "trust_remote_code": True}
+        if streaming:
+            kwargs["streaming"] = True
+        if self.hf_token:
+            kwargs["token"] = self.hf_token
+
+        try:
+            logger.info(f"Attempting to load {self.dataset_name} (split={split})...")
+            dataset = load_dataset(self.dataset_name, self.language_code, **kwargs)
+            dataset = dataset.cast_column("audio", Audio(sampling_rate=self.sampling_rate))
+            if not streaming and max_samples and max_samples < len(dataset):
+                dataset = dataset.select(range(max_samples))
+            return dataset
+        except Exception as e:
+            logger.warning(
+                f"Could not load {self.dataset_name} ({e}). "
+                "Falling back to ungated Google FLEURS Turkish ('google/fleurs', 'tr_tr')..."
+            )
+            return self.load_fleurs(split=split, max_samples=max_samples, streaming=streaming)
+
+    def load_fleurs(self, split: str = "test", max_samples: int = None, streaming: bool = False) -> Any:
         """Load Google FLEURS Turkish dataset split."""
-        dataset = load_dataset(
-            "google/fleurs",
-            "tr_in",
-            split=split,
-            trust_remote_code=True,
-        )
-        dataset = dataset.cast_column("audio", Audio(sampling_rate=self.sampling_rate))
-        if max_samples and max_samples < len(dataset):
-            dataset = dataset.select(range(max_samples))
-        return dataset
+        if load_dataset is None:
+            raise ImportError("HuggingFace `datasets` package is required.")
 
-    def prepare_sample(self, batch: Dict[str, Any], processor: AutoProcessor) -> Dict[str, Any]:
+        kwargs = {"split": split, "trust_remote_code": True}
+        if streaming:
+            kwargs["streaming"] = True
+        if self.hf_token:
+            kwargs["token"] = self.hf_token
+
+        for config in ["tr_tr", "tr_in"]:
+            try:
+                logger.info(f"Loading FLEURS Turkish dataset ('google/fleurs', config='{config}', split='{split}')...")
+                dataset = load_dataset("google/fleurs", config, **kwargs)
+                dataset = dataset.cast_column("audio", Audio(sampling_rate=self.sampling_rate))
+                if not streaming and max_samples and max_samples < len(dataset):
+                    dataset = dataset.select(range(max_samples))
+                return dataset
+            except Exception as err:
+                logger.warning(f"Failed to load FLEURS config '{config}': {err}")
+
+        raise RuntimeError("Unable to load Google FLEURS Turkish dataset.")
+
+    def prepare_sample(self, batch: Dict[str, Any], processor: Any) -> Dict[str, Any]:
         """Preprocess audio array and text transcript for model consumption."""
         audio = batch["audio"]
-        text = batch.get("sentence") or batch.get("transcription") or batch.get("text", "")
+        text = batch.get("sentence") or batch.get("transcription") or batch.get("text") or batch.get("raw_transcription") or ""
 
         # 1. Turkish Normalization
         norm_text = self.normalizer(text)
@@ -104,7 +141,7 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
 
         # If decoder_start_token_id is present, cut the first token if it matches
-        if (labels[:, 0] == self.decoder_start_token_id).all():
+        if self.decoder_start_token_id is not None and (labels[:, 0] == self.decoder_start_token_id).all():
             labels = labels[:, 1:]
 
         batch["labels"] = labels
