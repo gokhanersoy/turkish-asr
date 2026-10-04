@@ -137,15 +137,18 @@ def main():
         greater_is_better=False,
     )
 
-    trainer = Seq2SeqTrainer(
-        args=training_args,
-        model=model,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        data_collator=data_collator,
-        compute_metrics=compute_metrics,
-        tokenizer=processor.feature_extractor,
-    )
+    trainer_kwargs = {
+        "args": training_args,
+        "model": model,
+        "train_dataset": train_dataset,
+        "eval_dataset": eval_dataset,
+        "data_collator": data_collator,
+        "compute_metrics": compute_metrics,
+    }
+    try:
+        trainer = Seq2SeqTrainer(processing_class=processor.feature_extractor, **trainer_kwargs)
+    except TypeError:
+        trainer = Seq2SeqTrainer(tokenizer=processor.feature_extractor, **trainer_kwargs)
 
     if not args.eval_only:
         print("Starting training...")
